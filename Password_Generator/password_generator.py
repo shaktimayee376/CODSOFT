@@ -1,43 +1,60 @@
+import tkinter as tk
 import random
 import string
 
-print("Password Creator")
 
-while True:
-    choice = input("\nEnter password length (or 0 to exit): ")
-
+# ---------- PASSWORD LOGIC ----------
+def generate_password():
     try:
-        size = int(choice)
+        length = int(length_var.get())
 
-        if size == 0:
-            print("Program Closed")
-            break
+        if length < 4:
+            result.set("Length too small (min 4)")
+            return
 
-        if size < 8:
-            print("Choose at least 8 characters.")
-            continue
+        chars = string.ascii_letters + string.digits + string.punctuation
 
-        chars = (
-            string.ascii_letters +
-            string.digits +
-            "!@#$%^&*?"
-        )
+        password = "".join(random.choice(chars) for _ in range(length))
 
-        password_list = []
-
-        password_list.append(random.choice(string.ascii_lowercase))
-        password_list.append(random.choice(string.ascii_uppercase))
-        password_list.append(random.choice(string.digits))
-        password_list.append(random.choice("!@#$%^&*?"))
-
-        for _ in range(size - 4):
-            password_list.append(random.choice(chars))
-
-        random.shuffle(password_list)
-
-        final_password = "".join(password_list)
-
-        print("Your Password:", final_password)
+        result.set(password)
 
     except ValueError:
-        print("Please enter a valid number.")
+        result.set("Enter valid number")
+
+
+def copy_password():
+    root.clipboard_clear()
+    root.clipboard_append(result.get())
+    status.set("Copied to clipboard")
+
+
+# ---------- GUI ----------
+root = tk.Tk()
+root.title("Password Generator")
+root.geometry("400x300")
+
+
+length_var = tk.StringVar()
+result = tk.StringVar()
+status = tk.StringVar()
+
+
+tk.Label(root, text="Enter Password Length").pack(pady=5)
+tk.Entry(root, textvariable=length_var).pack()
+
+
+tk.Button(root, text="Generate Password", command=generate_password, bg="green", fg="white").pack(pady=10)
+
+
+tk.Label(root, text="Generated Password:").pack()
+
+tk.Entry(root, textvariable=result, width=40).pack(pady=5)
+
+
+tk.Button(root, text="Copy Password", command=copy_password, bg="blue", fg="white").pack(pady=5)
+
+
+tk.Label(root, textvariable=status, fg="darkblue").pack(pady=10)
+
+
+root.mainloop()
